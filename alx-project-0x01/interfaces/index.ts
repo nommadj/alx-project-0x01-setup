@@ -9,14 +9,14 @@ export interface PostModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (post: PostData) => void;
-  initialData?: PostData | null;
+  post?: PostData;
 }
 
 export interface UserProps {
   id: number;
   name: string;
-  email: string;
   username: string;
+  email: string;
   address: {
     street: string;
   };
@@ -29,5 +29,5 @@ export interface UserModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (post: UserProps) => void;
-  initialData?: UserProps | null;
+  user?: UserProps;
 }

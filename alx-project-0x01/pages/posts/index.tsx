@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { GetStaticProps } from "next";
 import PostCard from "@/components/PostCard";
 import PostModal from "@/components/PostModal";
 import Header from "@/components/Header";
@@ -13,34 +12,30 @@ export default function Posts({ posts }: PostProps) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [post, setPost] = useState<PostData | null>(null);
 
-  const handleAddPost = (newPost: PostData) => {
-    console.log("Post submitted:", newPost);
-    setModalOpen(false);
-  };
-
   return (
-    <>
+    <div>
       <Header />
-      <button onClick={() => setModalOpen(true)}>Add Post</button>
+      <button onClick={() => setModalOpen(true)}>Create Post</button>
       {posts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
       <PostModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmit={handleAddPost}
-        initialData={post}
+        onSubmit={(post) => console.log(post)}
+        post={post ?? undefined}
       />
-    </>
+    </div>
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export async function getStaticProps() {
   const res = await fetch("https://jsonplaceholder.typicode.com/posts");
   const posts: PostData[] = await res.json();
+
   return {
     props: {
       posts,
     },
   };
-};
+}
