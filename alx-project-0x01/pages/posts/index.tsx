@@ -1,49 +1,46 @@
-'use client';
-import React, { useState } from 'react';
-import { PostProps, PostData } from '@/interfaces';
-import Post from '@/components/Post';
-import PostModal from '@/components/PostModal';
+import { useState } from "react";
+import { GetStaticProps } from "next";
+import PostCard from "@/components/PostCard";
+import PostModal from "@/components/PostModal";
+import Header from "@/components/Header";
+import { PostData } from "@/interfaces";
 
-const dummyPosts: PostData[] = [
-  {
-    id: 1,
-    title: 'First Post',
-    content: 'This is the first post.',
-    author: 'John Doe'
-  },
-  {
-    id: 2,
-    title: 'Second Post',
-    content: 'This is the second post.',
-    author: 'Jane Doe'
-  }
-];
+interface PostProps {
+  posts: PostData[];
+}
 
-export default function PostsPage() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function Posts({ posts }: PostProps) {
+  const [isModalOpen, setModalOpen] = useState(false);
   const [post, setPost] = useState<PostData | null>(null);
 
-  const handleClick = (post: PostData) => {
-    setPost(post);
-    setIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsOpen(false);
-    setPost(null);
+  const handleAddPost = (newPost: PostData) => {
+    console.log("Post submitted:", newPost);
+    setModalOpen(false);
   };
 
   return (
-    <div>
-      <h1>Posts</h1>
-      {dummyPosts.map((p) => (
-        <div key={p.id} onClick={() => handleClick(p)}>
-          <Post post={p} />
-        </div>
+    <>
+      <Header />
+      <button onClick={() => setModalOpen(true)}>Add Post</button>
+      {posts.map((post) => (
+        <PostCard key={post.id} post={post} />
       ))}
-      {post && (
-        <PostModal post={post} isOpen={isOpen} onClose={closeModal} />
-      )}
-    </div>
+      <PostModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleAddPost}
+        initialData={post}
+      />
+    </>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+  const posts: PostData[] = await res.json();
+  return {
+    props: {
+      posts,
+    },
+  };
+};

@@ -1,47 +1,29 @@
-'use client';
-import React, { useState } from 'react';
-import { UserProps } from '@/interfaces';
-import User from '@/components/User';
-import UserModal from '@/components/UserModal';
+import { GetStaticProps } from "next";
+import UserCard from "@/components/UserCard";
+import Header from "@/components/Header";
+import { UserProps } from "@/interfaces";
 
-const dummyUsers: UserProps[] = [
-  { id: 1, name: 'Alice', email: 'alice@example.com' },
-  { id: 2, name: 'Bob', email: 'bob@example.com' }
-];
+interface UsersPageProps {
+  users: UserProps[];
+}
 
-export default function UsersPage() {
-  const [selectedUser, setSelectedUser] = useState<UserProps | null>(null);
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const handleClick = (user: UserProps) => {
-    setSelectedUser(user);
-    setModalOpen(true);
-  };
-
-  const handleClose = () => {
-    setModalOpen(false);
-    setSelectedUser(null);
-  };
-
+export default function Users({ users }: UsersPageProps) {
   return (
-    <div>
-      <h1>Users</h1>
-      {dummyUsers.map((user) => (
-        <div key={user.id} onClick={() => handleClick(user)}>
-          <User user={user} />
-        </div>
+    <>
+      <Header />
+      {users.map((user) => (
+        <UserCard key={user.id} user={user} />
       ))}
-      {selectedUser && (
-        <UserModal
-          user={selectedUser}
-          isOpen={isModalOpen}
-          onClose={handleClose}
-          onSubmit={(user) => {
-            console.log('User submitted:', user);
-            handleClose();
-          }}
-        />
-      )}
-    </div>
+    </>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  const res = await fetch("https://jsonplaceholder.typicode.com/users");
+  const users: UserProps[] = await res.json();
+  return {
+    props: {
+      users,
+    },
+  };
+};
